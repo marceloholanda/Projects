@@ -15,27 +15,24 @@
   </div>
 
   <div class="max-w-2xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
-    <h2 class="text-2xl font-semibold text-center text-red-800 mb-7">Cálculo de Reajuste Contratual - Locação P1 e P2</h2>
+    <h2 class="text-2xl font-semibold text-center text-red-800 mb-7">Cálculo de Reajuste Baseado nos Valores Referentes a Materiais ou Outros</h2>
 
-    <label class="font-semibold" for="p1">Valor Atual P1</label>
-    <input type="text" id="p1" placeholder="Ex: R$ 8.000,00" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+    <label class="font-semibold" for="valorAtual">Valor Atual</label>
+    <input type="text" id="valorAtual" placeholder="Ex: R$ 8.000,00" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
 
-    <label class="font-semibold" for="p2">Valor Atual P2</label>
-    <input type="text" id="p2" placeholder="Ex: R$ 4.260,00" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
-
-    <label class="font-semibold" for="indice">Índice de Reajuste (%) / IGP-M, IPCA, INCC, ICTI e entre outros</label>
+    <label class="font-semibold" for="indice">Índice de Reajuste (%)</label>
     <input type="text" id="indice" placeholder="Ex: 4,59001" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
 
-    <label class="font-semibold" for="inicioRetro">Data Início Retroativo (opcional)</label>
+    <label class="font-semibold" for="inicioRetro">Data Início Retroativa</label>
     <input type="text" id="inicioRetro" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
 
-    <label class="font-semibold" for="fimRetro">Data Fim Retroativo (opcional)</label>
+    <label class="font-semibold" for="fimRetro">Data Fim Retroativa</label>
     <input type="text" id="fimRetro" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
 
-    <label class="font-semibold" for="inicioRem">Data Início Remanescente (opcional)</label>
+    <label class="font-semibold" for="inicioRem">Data Início Remanescente</label>
     <input type="text" id="inicioRem" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
 
-    <label class="font-semibold" for="fimRem">Data Fim Remanescente / Vigência do Contrato / Consulta s320 (opcional)</label>
+    <label class="font-semibold" for="fimRem">Data Fim Remanescente</label>
     <input type="text" id="fimRem" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-6">
 
     <button onclick="calcular()" class="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 rounded">CALCULAR</button>
@@ -64,23 +61,22 @@
     function dias360(dataInicio, dataFim) {
       let [dia1, mes1, ano1] = dataInicio.split("/").map(Number);
       let [dia2, mes2, ano2] = dataFim.split("/").map(Number);
+
+      // Se o dia de início for 31, ajusta para 30
       if (dia1 === 31) dia1 = 30;
       if (dia2 === 31 && dia1 === 30) dia2 = 30;
-      return ((ano2 - ano1) * 360 + (mes2 - mes1) * 30 + (dia2 - dia1));
-    }
 
-    function arredondar(valor) {
-      return Math.round((valor + Number.EPSILON) * 100) / 100;
+      // Cálculo dos dias conforme o método de 360 dias
+      return ((ano2 - ano1) * 360 + (mes2 - mes1) * 30 + (dia2 - dia1));
     }
 
     function calcular() {
       const msgErro = document.getElementById('mensagemErro');
-      const p1 = parseFloat(document.getElementById('p1').value.replace('.', '').replace(',', '.'));
-      const p2 = parseFloat(document.getElementById('p2').value.replace('.', '').replace(',', '.'));
+      const valorAtual = parseFloat(document.getElementById('valorAtual').value.replace('.', '').replace(',', '.'));
       const indice = parseFloat(document.getElementById('indice').value.replace(',', '.')) / 100;
 
-      if (isNaN(p1) || isNaN(p2) || isNaN(indice)) {
-        msgErro.textContent = '⚠️ Preencha corretamente os campos obrigatórios: P1, P2 e Índice de Reajuste.';
+      if (isNaN(valorAtual) || isNaN(indice)) {
+        msgErro.textContent = '⚠️ Preencha corretamente os campos obrigatórios: Valor Atual e Índice de Reajuste.';
         msgErro.classList.remove('hidden');
         document.getElementById('resultado').innerHTML = '';
         return;
@@ -88,58 +84,53 @@
 
       msgErro.classList.add('hidden');
 
+      // Calculando o valor reajustado
+      const valorReajustado = valorAtual * (1 + indice);
+      const diferencaMensal = valorReajustado - valorAtual;
+
+      let resultado = `
+        <strong>Valor Atual:</strong> R$ ${valorAtual.toFixed(2)}<br>
+        <strong>Índice de Reajuste:</strong> ${indice * 100}%<br>
+        <strong>Valor Reajustado:</strong> R$ ${valorReajustado.toFixed(2)}<br><br>
+
+        <strong>Diferença Mensal:</strong> R$ ${diferencaMensal.toFixed(2)}<br><br>
+      `;
+
+      let totalRetro = 0;
+      let totalRem = 0;
+
       const inicioRetro = document.getElementById('inicioRetro').value;
       const fimRetro = document.getElementById('fimRetro').value;
       const inicioRem = document.getElementById('inicioRem').value;
       const fimRem = document.getElementById('fimRem').value;
 
-      const valorAtual = arredondar(p1 + p2);
-      const p1Reaj = arredondar(p1 * (1 + indice));
-      const p2Reaj = arredondar(p2 * (1 + indice));
-      const valorReaj = arredondar(p1Reaj + p2Reaj);
-      const diferencaMensal = arredondar(valorReaj - valorAtual);
-
-      let resultado = `
-        <strong>Valor Atual:</strong><br>
-        P1: R$ ${p1.toFixed(2)}<br>
-        P2: R$ ${p2.toFixed(2)}<br>
-        Total: R$ ${valorAtual.toFixed(2)}<br><br>
-
-        <strong>Valor Reajustado:</strong><br>
-        P1: R$ ${p1Reaj.toFixed(2)}<br>
-        P2: R$ ${p2Reaj.toFixed(2)}<br>
-        Total: R$ ${valorReaj.toFixed(2)}<br><br>
-
-        <strong>Diferença Mensal:</strong> R$ ${diferencaMensal.toFixed(2)}<br><br>
-      `;
-
-      let totalRetro = 0, totalRem = 0;
-
+      // Calculando o valor retroativo com base nos meses
       if (inicioRetro && fimRetro) {
-        const mesesRetro = arredondar((dias360(inicioRetro, fimRetro) + 1) / 30);
-        totalRetro = arredondar(diferencaMensal * mesesRetro);
-        resultado += `<strong>Meses Retroativos:</strong> ${mesesRetro.toFixed(2)} meses<br>`;
+        const mesesRetro = (dias360(inicioRetro, fimRetro) + 1) / 30;
+        totalRetro = diferencaMensal * mesesRetro;
+        resultado += `<strong>Meses Retroativos:</strong> ${mesesRetro.toFixed(4)} meses<br>`;
         resultado += `<strong>Valor Retroativo:</strong> R$ ${totalRetro.toFixed(2)}<br><br>`;
       }
 
+      // Calculando o valor remanescente com base nos meses
       if (inicioRem && fimRem) {
-        const mesesRem = arredondar((dias360(inicioRem, fimRem) + 1) / 30);
-        totalRem = arredondar(diferencaMensal * mesesRem);
-        resultado += `<strong>Meses Remanescentes:</strong> ${mesesRem.toFixed(2)} meses<br>`;
+        const mesesRem = (dias360(inicioRem, fimRem) + 1) / 30;
+        totalRem = diferencaMensal * mesesRem;
+        resultado += `<strong>Meses Remanescentes:</strong> ${mesesRem.toFixed(4)} meses<br>`;
         resultado += `<strong>Valor Remanescente:</strong> R$ ${totalRem.toFixed(2)}<br><br>`;
       }
 
+      // Valor final PLC (soma dos valores retroativo e remanescente)
       if (totalRetro > 0 || totalRem > 0) {
         resultado += `<strong>Valor Total da PLC:</strong> <span class="text-red-800 font-bold">R$ ${(totalRetro + totalRem).toFixed(2)}</span>`;
       } else {
-        resultado += `<em class="text-sm text-gray-500">Nenhuma data de retroativo ou remanescente preenchida. Cálculo simples de reajuste realizado.</em>`;
+        resultado += `<em class="text-sm text-gray-500">Nenhuma data retroativa ou remanescente preenchida. Cálculo simples de reajuste realizado.</em>`;
       }
 
       document.getElementById('resultado').innerHTML = resultado;
     }
 
-    IMask(document.getElementById('p1'), { mask: Number, scale: 2, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: true });
-    IMask(document.getElementById('p2'), { mask: Number, scale: 2, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: true });
+    IMask(document.getElementById('valorAtual'), { mask: Number, scale: 2, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: true });
     IMask(document.getElementById('indice'), { mask: Number, scale: 5, signed: false, thousandsSeparator: '', radix: ',', padFractionalZeros: true });
 
     const dateMask = { mask: '00/00/0000' };

@@ -53,6 +53,20 @@
     <div id="resultado" class="mt-4 p-4 bg-gray-50 border-l-8 border-red-700 rounded text-gray-700"></div>
   </div>
 
+  <!-- Botões de Voltar -->
+  <div class="flex justify-center gap-4 mt-6">
+  <!-- Voltar para o Menu Principal -->
+  <a href="index.html" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+    Voltar ao Menu Principal
+  </a>
+  
+  <!-- Voltar para a Seleção Anterior -->
+  <button onclick="window.history.back()" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+    Voltar à Seleção Anterior
+  </button>
+  </div>
+  </div>
+
   <footer class="mt-20 text-center text-sm text-gray-500 pb-8">© 2025 Stick e Banco do Nordeste. Todos os direitos reservados.</footer>
 
   <script>
@@ -72,6 +86,11 @@
 
       // Cálculo dos dias conforme o método de 360 dias
       return ((ano2 - ano1) * 360 + (mes2 - mes1) * 30 + (dia2 - dia1));
+    }
+
+    // Função para arredondar valores para 2 casas decimais
+    function arredondar(valor) {
+      return Math.round((valor + Number.EPSILON) * 100) / 100;
     }
 
     function calcular() {
@@ -94,12 +113,12 @@
       const valorAtual = valorP1 + valorP2;
 
       // Calculando o valor reajustado do 1º período
-      const valorReajustado1 = valorP1 * (1 + indice1) + valorP2 * (1 + indice1);
-      const diferencaMensal1 = valorReajustado1 - valorAtual;
+      const valorReajustado1 = arredondar(valorP1 * (1 + indice1) + valorP2 * (1 + indice1));
+      const diferencaMensal1 = arredondar(valorReajustado1 - valorAtual);
 
       // Calculando o valor reajustado do 2º período (utilizando o valor reajustado do 1º período)
-      const valorReajustado2 = valorReajustado1 * (1 + indice2);
-      const diferencaMensal2 = valorReajustado2 - valorAtual; // Agora a diferença mensal do 2º período é feita usando o valor atual
+      const valorReajustado2 = arredondar(valorReajustado1 * (1 + indice2));
+      const diferencaMensal2 = arredondar(valorReajustado2 - valorAtual); // Agora a diferença mensal do 2º período é feita usando o valor atual
 
       let resultado = `
         <strong>Valor Atual:</strong> R$ ${(valorP1 + valorP2).toFixed(2)}<br>
@@ -119,8 +138,8 @@
       const inicioRetro1 = document.getElementById('inicioRetro1').value;
       const fimRetro1 = document.getElementById('fimRetro1').value;
       if (inicioRetro1 && fimRetro1) {
-        const mesesRetro1 = (dias360(inicioRetro1, fimRetro1) + 1) / 30;
-        totalRetro1 = diferencaMensal1 * mesesRetro1;
+        const mesesRetro1 = arredondar((dias360(inicioRetro1, fimRetro1) + 1) / 30);
+        totalRetro1 = arredondar(diferencaMensal1 * mesesRetro1);
         resultado += `<strong>Meses Retroativos 1º Período:</strong> ${mesesRetro1.toFixed(4)} meses<br>`;
         resultado += `<strong>Valor Retroativo 1º Período:</strong> R$ ${totalRetro1.toFixed(2)}<br><br>`;
       }
@@ -129,8 +148,8 @@
       const inicioRetro2 = document.getElementById('inicioRetro2').value;
       const fimRetro2 = document.getElementById('fimRetro2').value;
       if (inicioRetro2 && fimRetro2) {
-        const mesesRetro2 = (dias360(inicioRetro2, fimRetro2) + 1) / 30;
-        totalRetro2 = diferencaMensal2 * mesesRetro2;
+        const mesesRetro2 = arredondar((dias360(inicioRetro2, fimRetro2) + 1) / 30);
+        totalRetro2 = arredondar(diferencaMensal2 * mesesRetro2);
         resultado += `<strong>Meses Retroativos 2º Período:</strong> ${mesesRetro2.toFixed(4)} meses<br>`;
         resultado += `<strong>Valor Retroativo 2º Período:</strong> R$ ${totalRetro2.toFixed(2)}<br><br>`;
       }
@@ -139,14 +158,14 @@
       const inicioRem = document.getElementById('inicioRem').value;
       const fimRem = document.getElementById('fimRem').value;
       if (inicioRem && fimRem) {
-        const mesesRem = (dias360(inicioRem, fimRem) + 1) / 30;
-        totalRem = diferencaMensal2 * mesesRem;  // Usando a diferença do 2º período
+        const mesesRem = arredondar((dias360(inicioRem, fimRem) + 1) / 30);
+        totalRem = arredondar(diferencaMensal2 * mesesRem);  // Usando a diferença do 2º período
         resultado += `<strong>Meses Remanescentes:</strong> ${mesesRem.toFixed(4)} meses<br>`;
         resultado += `<strong>Valor Remanescente:</strong> R$ ${totalRem.toFixed(2)}<br><br>`;
       }
 
       // Valor final PLC
-      const valorTotalPLC = totalRetro1 + totalRetro2 + totalRem;
+      const valorTotalPLC = arredondar(totalRetro1 + totalRetro2 + totalRem);
       resultado += `<strong>Valor Total da PLC:</strong> <span class="text-red-800 font-bold">R$ ${valorTotalPLC.toFixed(2)}</span>`;
 
       document.getElementById('resultado').innerHTML = resultado;
