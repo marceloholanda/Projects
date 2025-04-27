@@ -3,40 +3,191 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reajuste Contratual - Locação</title>
+  <title>Reajuste Contratual - Itens/medições</title>
+  <link rel="icon" href="imagens/ChatGPT Image 18 de abr. de 2025, 11_41_37.png">
+  <script src="https://unpkg.com/imask"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100">
-  <!-- Header -->
-  <header class="bg-white shadow-md py-6 flex justify-center">
+  <div class="flex justify-center bg-white py-6">
     <img src="../../../imagens/logo.png" alt="Banco do Nordeste" class="w-72 md:w-80 lg:w-96">
-  </header>
+  </div>
 
-  <!-- Título -->
-  <section class="text-center py-16 px-4 bg-white-50">
-    <h1 class="text-3xl md:text-4xl font-bold text-red-800 mb-4">Reajuste Contratual - Locação</h1>
-    <p class="text-gray-600 max-w-xl mx-auto">Escolha abaixo o tipo de reajuste que deseja aplicar para contratos de Locação.</p>
-  </section>
+  <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+    <h2 class="text-2xl font-semibold text-center text-red-800 mb-7">Cálculo de Itens/Medições</h2>
 
- 
+    <!-- Botões de adicionar e remover -->
+    <div class="flex justify-center gap-4 mb-4">
+      <button onclick="adicionarItem()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">ADICIONAR ITEM/MEDIÇÃO</button>
+      <button onclick="removerItem()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">APAGAR ITEM/MEDIÇÃO</button>
+    </div>
 
-  <!-- Botões de Voltar -->
-<div class="flex justify-center gap-4 pb-6">
-  <!-- Voltar para a Página Anterior -->
-  <a href="../engenharia/engenharia.html" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full inline-block transition duration-200 transform hover:scale-105">
-    Voltar à Página Anterior
-  </a>
+    <!-- Container dos inputs de itens -->
+    <div id="itensContainer" class="space-y-4 mb-6">
+      <!-- Inputs serão adicionados aqui -->
+    </div>
 
-  <!-- Voltar para a Página Principal -->
-  <a href="../../../index.html" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full inline-block transition duration-200 transform hover:scale-105">
-    Voltar à Página Principal
-  </a>
-</div>
+    <!-- Índice de reajuste -->
+    <label class="font-semibold" for="indice">Índice de Reajuste (%)</label>
+    <input type="text" id="indice" placeholder="Ex: 3,21000" class="w-full px-3 py-2 rounded border border-gray-300 mb-6">
 
-  
-  <!-- Rodapé -->
-  <footer class="bg-white text-center text-sm text-gray-500 py-6 border-t" style="position: absolute; bottom: 0; width: 100%;">
+    <button onclick="calcular()" class="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 rounded">CALCULAR</button>
+
+    <div id="mensagemErro" class="hidden mt-4 p-4 bg-red-100 border-l-8 border-red-700 rounded text-red-800 font-medium"></div>
+    <div id="resultado" class="mt-4 p-4 bg-gray-50 border-l-8 border-red-700 rounded text-gray-700"></div>
+  </div>
+
+  <div class="flex justify-center gap-4 mt-6">
+    <button onclick="window.history.back()" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+      Voltar à Seleção Anterior
+    </button>
+    <a href="../../../index.html" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+      Voltar ao Menu Principal
+    </a>
+  </div>
+
+  <footer class="mt-20 text-center text-sm text-gray-500 pb-8">
     © 2025 Stick e Banco do Nordeste. Todos os direitos reservados.
   </footer>
+
+  <script>
+    let contadorItens = 0;
+    const masks = [];
+  
+    function adicionarItem() {
+      contadorItens++;
+      const container = document.getElementById('itensContainer');
+  
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.id = `item-${contadorItens}`;
+  
+      div.innerHTML = `
+        <label class="w-32 font-semibold">ITEM ${contadorItens}</label>
+        <input type="text" id="valor-${contadorItens}" placeholder="Valor do Item" class="flex-1 px-3 py-2 rounded border border-gray-300">
+      `;
+  
+      container.appendChild(div);
+  
+      // Aplicar máscara no novo input
+      const input = document.getElementById(`valor-${contadorItens}`);
+      const mask = IMask(input, {
+        mask: Number,
+        scale: 2,
+        signed: false,
+        thousandsSeparator: '.',
+        radix: ',',
+        padFractionalZeros: true
+      });
+      masks.push(mask);
+    }
+  
+    function removerItem() {
+      if (contadorItens > 0) {
+        const container = document.getElementById('itensContainer');
+        const div = document.getElementById(`item-${contadorItens}`);
+        container.removeChild(div);
+        masks.pop(); // Remove última máscara
+        contadorItens--;
+      }
+    }
+  
+    function arredondar(valor) {
+      return Math.round((valor + Number.EPSILON) * 10000) / 10000;
+    }
+  
+    function formatarNumero(valor) {
+      return valor.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+    }
+  
+    function calcular() {
+      const msgErro = document.getElementById('mensagemErro');
+      const indiceInput = document.getElementById('indice').value.replace(',', '.');
+      const indice = parseFloat(indiceInput) / 100;
+  
+      if (isNaN(indice) || contadorItens === 0) {
+        msgErro.textContent = '⚠️ Preencha os itens e o índice de reajuste corretamente.';
+        msgErro.classList.remove('hidden');
+        document.getElementById('resultado').innerHTML = '';
+        return;
+      }
+  
+      msgErro.classList.add('hidden');
+  
+      let resultado = `
+        <div class="overflow-x-auto">
+          <table class="table-auto w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="border p-2">ITEM</th>
+                <th class="border p-2">VALOR ITEM/MEDIÇÃO</th>
+                <th class="border p-2">RESULTADO</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+  
+      let totalOriginal = 0;
+      let totalReajustado = 0;
+  
+      for (let i = 1; i <= contadorItens; i++) {
+        const valorInput = document.getElementById(`valor-${i}`);
+        const valorOriginal = parseFloat(valorInput.value.replace('.', '').replace(',', '.'));
+        if (isNaN(valorOriginal)) continue;
+  
+        const valorReajustado = arredondar(valorOriginal * (1 + indice));
+  
+        totalOriginal += valorOriginal;
+        totalReajustado += valorReajustado;
+  
+        resultado += `
+          <tr>
+            <td class="border p-2">ITEM ${i}</td>
+            <td class="border p-2">R$ ${formatarNumero(valorOriginal)}</td>
+            <td class="border p-2">R$ ${formatarNumero(valorReajustado)}</td>
+          </tr>
+        `;
+      }
+  
+      const valorPLC = arredondar(totalReajustado - totalOriginal);
+  
+      resultado += `
+            </tbody>
+          </table>
+        </div>
+  
+        <div class="mt-6 text-right text-lg font-semibold">
+          REAJUSTE APLICADO: ${(indice * 100).toFixed(2).replace('.', ',')}%
+        </div>
+  
+        <div class="mt-2 text-right text-lg">
+          Valor Total Antes do Reajuste: <strong>R$ ${formatarNumero(totalOriginal)}</strong><br>
+          Valor Total Após o Reajuste: <strong>R$ ${formatarNumero(totalReajustado)}</strong><br>
+          Valor da PLC: <strong class="text-red-800">R$ ${formatarNumero(valorPLC)}</strong>
+        </div>
+      `;
+  
+      document.getElementById('resultado').innerHTML = resultado;
+    }
+  
+    // Máscara para índice
+    const indiceMask = IMask(document.getElementById('indice'), {
+      mask: Number,
+      scale: 5,
+      signed: false,
+      thousandsSeparator: '',
+      radix: ',',
+      padFractionalZeros: true
+    });
+  
+    // Adicionar os dois primeiros itens automaticamente
+    window.onload = function() {
+      adicionarItem();
+      adicionarItem();
+    };
+  </script>
+  
+  
 </body>
 </html>

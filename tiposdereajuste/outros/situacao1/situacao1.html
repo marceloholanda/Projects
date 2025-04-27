@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cálculo Outros - Situação 1</title>
+  <link rel="icon" href="../../../imagens/ChatGPT Image 18 de abr. de 2025, 11_41_37.png">
+  <script src="https://unpkg.com/imask"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+  <!-- Cabeçalho -->
+  <div class="flex justify-center bg-white py-6">
+    <img src="../../../imagens/logo.png" alt="Banco do Nordeste" class="w-72 md:w-80 lg:w-96">
+  </div>
+
+  <!-- Conteúdo principal -->
+  <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+    <h2 class="text-2xl font-semibold text-center text-red-800 mb-7">Cálculo Outros - Situação 1</h2>
+
+    <!-- Arredondamento -->
+    <div class="mb-6">
+      <p class="font-semibold mb-2">OS CÁLCULOS USAM ARREDONDAMENTO?</p>
+      <div class="flex gap-4">
+        <label><input type="checkbox" id="arredData" class="mr-1">Data</label>
+        <label><input type="checkbox" id="arredValor" class="mr-1">Valor</label>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex flex-wrap justify-center gap-4 mb-6">
+      <button onclick="adicionarPeriodo()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">Adicionar Período</button>
+      <button onclick="removerPeriodo()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">Apagar Período</button>
+      <button onclick="adicionarItem()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">Adicionar Item</button>
+      <button onclick="removerItem()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">Apagar Item</button>
+    </div>
+
+    <!-- Container dos períodos -->
+    <div id="periodosContainer" class="space-y-8 mb-6"></div>
+
+    <button onclick="calcular()" class="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 rounded mb-6">CALCULAR</button>
+
+    <div id="mensagemErro" class="hidden mt-4 p-4 bg-red-100 border-l-8 border-red-700 rounded text-red-800 font-medium"></div>
+
+    <div id="resultado" class="p-4 bg-gray-50 border-l-8 border-red-700 rounded text-gray-700"></div>
+
+    <!-- Botões de Navegação -->
+    <div class="flex justify-center gap-4 mt-6">
+      <button onclick="window.history.back()" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+        Voltar à Seleção Anterior
+      </button>
+      <a href="../../../index.html" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+        Voltar ao Menu Principal
+      </a>
+    </div>
+  </div>
+
+  <!-- Rodapé -->
+  <footer class="mt-20 text-center text-sm text-gray-500 pb-8">
+    © 2025 Stick e Banco do Nordeste. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    let contadorPeriodos = 0;
+    const periodos = [];
+
+    function adicionarPeriodo() {
+      contadorPeriodos++;
+      const container = document.getElementById('periodosContainer');
+
+      const div = document.createElement('div');
+      div.className = 'space-y-4';
+      div.id = `periodo-${contadorPeriodos}`;
+
+      div.innerHTML = `
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label class="font-semibold">Data Início</label>
+            <input type="text" id="inicio-${contadorPeriodos}" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300">
+          </div>
+          <div class="flex-1">
+            <label class="font-semibold">Data Fim</label>
+            <input type="text" id="fim-${contadorPeriodos}" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300">
+          </div>
+        </div>
+
+        <div class="flex gap-4 items-center">
+          <p class="font-semibold">APLICA REAJUSTE?</p>
+          <label><input type="radio" name="reajuste-${contadorPeriodos}" value="sim" class="mr-1">Sim</label>
+          <label><input type="radio" name="reajuste-${contadorPeriodos}" value="nao" class="mr-1">Não</label>
+          <div class="flex-1">
+            <label class="font-semibold">Índice de Reajuste (%)</label>
+            <input type="text" id="indice-${contadorPeriodos}" placeholder="Ex: 3,69000" class="w-full px-3 py-2 rounded border border-gray-300">
+          </div>
+        </div>
+
+        <div id="itens-${contadorPeriodos}" class="space-y-2"></div>
+      `;
+
+      container.appendChild(div);
+
+      IMask(document.getElementById(`inicio-${contadorPeriodos}`), { mask: '00/00/0000' });
+      IMask(document.getElementById(`fim-${contadorPeriodos}`), { mask: '00/00/0000' });
+      IMask(document.getElementById(`indice-${contadorPeriodos}`), { mask: Number, scale: 5, signed: false, thousandsSeparator: '', radix: ',', padFractionalZeros: true });
+
+      periodos.push({ id: contadorPeriodos, itens: [] });
+      adicionarItem();
+    }
+
+    function removerPeriodo() {
+      if (contadorPeriodos > 0) {
+        document.getElementById(`periodo-${contadorPeriodos}`).remove();
+        periodos.pop();
+        contadorPeriodos--;
+      }
+    }
+
+    function adicionarItem() {
+      if (contadorPeriodos === 0) return;
+
+      const periodo = periodos[periodos.length - 1];
+      const container = document.getElementById(`itens-${periodo.id}`);
+      const itemId = periodo.itens.length + 1;
+
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-2';
+      div.id = `item-${periodo.id}-${itemId}`;
+
+      div.innerHTML = `
+        <label class="w-32 font-semibold">Item ${itemId}</label>
+        <input type="text" id="qtd-${periodo.id}-${itemId}" placeholder="Quantidade" class="w-24 px-3 py-2 rounded border border-gray-300">
+        <input type="text" id="preco-${periodo.id}-${itemId}" placeholder="Preço Unitário" class="flex-1 px-3 py-2 rounded border border-gray-300">
+      `;
+
+      container.appendChild(div);
+
+      IMask(document.getElementById(`qtd-${periodo.id}-${itemId}`), { mask: Number, scale: 0, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: false });
+      IMask(document.getElementById(`preco-${periodo.id}-${itemId}`), { mask: Number, scale: 2, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: true });
+
+      periodo.itens.push(itemId);
+    }
+
+    function removerItem() {
+      if (contadorPeriodos === 0) return;
+
+      const periodo = periodos[periodos.length - 1];
+      if (periodo.itens.length > 0) {
+        const itemId = periodo.itens.pop();
+        document.getElementById(`item-${periodo.id}-${itemId}`).remove();
+      }
+    }
+
+    function formatarNumero(valor) {
+      return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function calcular() {
+      let resultado = '';
+      const usarArredData = document.getElementById('arredData').checked;
+      const usarArredValor = document.getElementById('arredValor').checked;
+
+      periodos.forEach(periodo => {
+        const inicio = document.getElementById(`inicio-${periodo.id}`).value;
+        const fim = document.getElementById(`fim-${periodo.id}`).value;
+        const indiceInput = document.getElementById(`indice-${periodo.id}`).value.replace(',', '.');
+        const indice = parseFloat(indiceInput) / 100 || 0;
+
+        let aplicaReajuste = false;
+        const radioSelecionado = document.querySelector(`input[name="reajuste-${periodo.id}"]:checked`);
+        if (radioSelecionado && radioSelecionado.value === "sim") {
+          aplicaReajuste = true;
+        }
+
+        resultado += `
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-red-800 mb-2">Período: ${inicio} - ${fim}</h3>
+
+            <div class="overflow-x-auto">
+              <table class="table-auto w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="border p-2">Item</th>
+                    <th class="border p-2">Quantidade</th>
+                    <th class="border p-2">Preço Unitário</th>
+                    <th class="border p-2">Preço Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+        `;
+
+        let totalPeriodo = 0;
+
+        periodo.itens.forEach(itemId => {
+          const qtd = parseInt(document.getElementById(`qtd-${periodo.id}-${itemId}`).value) || 0;
+          let precoUnit = parseFloat(document.getElementById(`preco-${periodo.id}-${itemId}`).value.replace('.', '').replace(',', '.')) || 0;
+
+          if (aplicaReajuste) {
+            precoUnit = precoUnit * (1 + indice);
+          }
+
+          if (usarArredValor) {
+            precoUnit = Math.round(precoUnit * 100) / 100;
+          }
+
+          let precoTotal = precoUnit * qtd;
+          if (usarArredValor) {
+            precoTotal = Math.round(precoTotal * 100) / 100;
+          }
+
+          totalPeriodo += precoTotal;
+
+          resultado += `
+            <tr>
+              <td class="border p-2">${itemId}</td>
+              <td class="border p-2">${qtd}</td>
+              <td class="border p-2">R$ ${formatarNumero(precoUnit)}</td>
+              <td class="border p-2">R$ ${formatarNumero(precoTotal)}</td>
+            </tr>
+          `;
+        });
+
+        resultado += `
+                </tbody>
+              </table>
+            </div>
+
+            <div class="mt-4 text-right text-lg font-semibold">
+              Total do Período: <span class="text-red-800">R$ ${formatarNumero(totalPeriodo)}</span><br>
+              Reajuste Aplicado: ${aplicaReajuste ? (indice * 100).toFixed(2).replace('.', ',') + '%' : 'Não aplicado'}
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('resultado').innerHTML = resultado;
+    }
+
+    window.onload = function() {
+      adicionarPeriodo();
+    }
+  </script>
+
+</body>
+</html>

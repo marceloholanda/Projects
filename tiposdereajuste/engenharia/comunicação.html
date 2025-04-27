@@ -3,40 +3,182 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reajuste Contratual - Locação</title>
+  <title>Reajuste Contratual - Períodos com Dois Índices</title>
+  <link rel="icon" href="imagens/ChatGPT Image 18 de abr. de 2025, 11_41_37.png">
+  <script src="https://unpkg.com/imask"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100">
-  <!-- Header -->
-  <header class="bg-white shadow-md py-6 flex justify-center">
+  <div class="flex justify-center bg-white py-6">
     <img src="../../../imagens/logo.png" alt="Banco do Nordeste" class="w-72 md:w-80 lg:w-96">
-  </header>
+  </div>
 
-  <!-- Título -->
-  <section class="text-center py-16 px-4 bg-white-50">
-    <h1 class="text-3xl md:text-4xl font-bold text-red-800 mb-4">Reajuste Contratual - Locação</h1>
-    <p class="text-gray-600 max-w-xl mx-auto">Escolha abaixo o tipo de reajuste que deseja aplicar para contratos de Locação.</p>
-  </section>
+  <div class="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+    <h2 class="text-2xl font-semibold text-center text-red-800 mb-7">Cálculo Comunicação/ART's, RRT's e TRT's</h2>
 
- 
+    <div class="flex justify-center gap-4 mb-4">
+      <button onclick="adicionarPeriodo()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+        ADICIONAR PERÍODO
+      </button>
+      <button onclick="removerPeriodo()" class="bg-red-800 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded">
+        APAGAR PERÍODO
+      </button>
+    </div>
 
-  <!-- Botões de Voltar -->
-<div class="flex justify-center gap-4 pb-6">
-  <!-- Voltar para a Página Anterior -->
-  <a href="../engenharia/engenharia.html" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full inline-block transition duration-200 transform hover:scale-105">
-    Voltar à Página Anterior
-  </a>
+    <div id="periodosContainer" class="space-y-8 mb-6"></div>
 
-  <!-- Voltar para a Página Principal -->
-  <a href="../../../index.html" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full inline-block transition duration-200 transform hover:scale-105">
-    Voltar à Página Principal
-  </a>
-</div>
+    <div class="text-xs text-gray-600 mb-6">
+      * ITENS DE COMUNICAÇÃO REAJUSTADOS POR ÍNDICE DO CONTRATO.<br>
+      ** ART's, RRT's, TRT's REAJUSTADOS POR ÍNDICE DOS CONSELHOS (INSERIR ÍNDICE MANUALMENTE).
+    </div>
 
-  
-  <!-- Rodapé -->
-  <footer class="bg-white text-center text-sm text-gray-500 py-6 border-t" style="position: absolute; bottom: 0; width: 100%;">
+    <button onclick="calcular()" class="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 rounded">CALCULAR</button>
+
+    <div id="mensagemErro" class="hidden mt-4 p-4 bg-red-100 border-l-8 border-red-700 rounded text-red-800 font-medium"></div>
+    <div id="resultado" class="mt-6 p-4 bg-gray-50 border-l-8 border-red-700 rounded text-gray-700"></div>
+  </div>
+
+  <div class="flex justify-center gap-4 mt-6">
+    <button onclick="window.history.back()" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+      Voltar à Seleção Anterior
+    </button>
+    <a href="../../../index.html" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+      Voltar ao Menu Principal
+    </a>
+  </div>
+
+  <footer class="mt-20 text-center text-sm text-gray-500 pb-8">
     © 2025 Stick e Banco do Nordeste. Todos os direitos reservados.
   </footer>
+
+<script>
+  let contadorPeriodos = 0;
+  const masks = [];
+
+  function adicionarPeriodo() {
+    contadorPeriodos++;
+    const container = document.getElementById('periodosContainer');
+
+    const div = document.createElement('div');
+    div.className = 'space-y-4'; // inputs empilhados verticalmente
+    div.id = `periodo-${contadorPeriodos}`;
+
+    div.innerHTML = `
+      <div>
+        <label class="font-semibold">Data Início</label>
+        <input type="text" id="inicio-${contadorPeriodos}" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300">
+      </div>
+
+      <div>
+        <label class="font-semibold">Data Fim</label>
+        <input type="text" id="fim-${contadorPeriodos}" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300">
+      </div>
+
+      <div>
+        <label class="font-semibold">Valor Itens Comunicação (*)</label>
+        <input type="text" id="comunicacao-${contadorPeriodos}" placeholder="Ex: 50.000,00" class="w-full px-3 py-2 rounded border border-gray-300">
+      </div>
+
+      <div>
+        <label class="font-semibold">Índice Comunicação (%)</label>
+        <input type="text" id="indice-comunicacao-${contadorPeriodos}" placeholder="Ex: 4,68000" class="w-full px-3 py-2 rounded border border-gray-300">
+      </div>
+
+      <div>
+        <label class="font-semibold">Valor ART's/RRT's/TRT's (**)</label>
+        <input type="text" id="arts-${contadorPeriodos}" placeholder="Ex: 10.000,00" class="w-full px-3 py-2 rounded border border-gray-300">
+      </div>
+
+      <div>
+        <label class="font-semibold">Índice ART's/RRT's/TRT's (%)</label>
+        <input type="text" id="indice-arts-${contadorPeriodos}" placeholder="Ex: 3,20000" class="w-full px-3 py-2 rounded border border-gray-300">
+      </div>
+    `;
+
+    container.appendChild(div);
+
+    // Aplicar máscaras
+    IMask(document.getElementById(`inicio-${contadorPeriodos}`), { mask: '00/00/0000' });
+    IMask(document.getElementById(`fim-${contadorPeriodos}`), { mask: '00/00/0000' });
+    masks.push(IMask(document.getElementById(`comunicacao-${contadorPeriodos}`), {
+      mask: Number, scale: 2, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: true
+    }));
+    masks.push(IMask(document.getElementById(`arts-${contadorPeriodos}`), {
+      mask: Number, scale: 2, signed: false, thousandsSeparator: '.', radix: ',', padFractionalZeros: true
+    }));
+    masks.push(IMask(document.getElementById(`indice-comunicacao-${contadorPeriodos}`), {
+      mask: Number, scale: 5, signed: false, thousandsSeparator: '', radix: ',', padFractionalZeros: true
+    }));
+    masks.push(IMask(document.getElementById(`indice-arts-${contadorPeriodos}`), {
+      mask: Number, scale: 5, signed: false, thousandsSeparator: '', radix: ',', padFractionalZeros: true
+    }));
+  }
+
+  function removerPeriodo() {
+    if (contadorPeriodos > 0) {
+      const container = document.getElementById('periodosContainer');
+      const div = document.getElementById(`periodo-${contadorPeriodos}`);
+      container.removeChild(div);
+      masks.splice(-4); // Remove 4 máscaras por período
+      contadorPeriodos--;
+    }
+  }
+
+  function arredondar(valor) {
+    return Math.round((valor + Number.EPSILON) * 10000) / 10000;
+  }
+
+  function formatarNumero(valor) {
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+  }
+
+  function calcular() {
+    const msgErro = document.getElementById('mensagemErro');
+
+    if (contadorPeriodos === 0) {
+      msgErro.textContent = '⚠️ Adicione ao menos um período para calcular.';
+      msgErro.classList.remove('hidden');
+      document.getElementById('resultado').innerHTML = '';
+      return;
+    }
+
+    msgErro.classList.add('hidden');
+
+    let resultado = '';
+
+    for (let i = 1; i <= contadorPeriodos; i++) {
+      const inicio = document.getElementById(`inicio-${i}`).value;
+      const fim = document.getElementById(`fim-${i}`).value;
+      const comunicacao = parseFloat(document.getElementById(`comunicacao-${i}`).value.replace('.', '').replace(',', '.'));
+      const arts = parseFloat(document.getElementById(`arts-${i}`).value.replace('.', '').replace(',', '.'));
+      const indiceComunicacao = parseFloat(document.getElementById(`indice-comunicacao-${i}`).value.replace(',', '.')) / 100;
+      const indiceArts = parseFloat(document.getElementById(`indice-arts-${i}`).value.replace(',', '.')) / 100;
+
+      const comunicacaoReajustada = arredondar(comunicacao * (1 + indiceComunicacao));
+      const artsReajustado = arredondar(arts * (1 + indiceArts));
+
+      resultado += `
+        <div class="mb-6 space-y-1">
+          <p><strong>DATA INÍCIO:</strong> ${inicio}</p>
+          <p><strong>DATA FIM:</strong> ${fim}</p>
+          <p><strong>VALOR ITENS COMUNICAÇÃO:</strong> R$ ${formatarNumero(comunicacao)}</p>
+          <p><strong>REAJUSTE COMUNICAÇÃO:</strong> ${(indiceComunicacao * 100).toFixed(5).replace('.', ',')}%</p>
+          <p><strong>VALOR ART's, RRT's e TRT's:</strong> R$ ${formatarNumero(arts)}</p>
+          <p><strong>REAJUSTE ART's, RRT's e TRT's:</strong> ${(indiceArts * 100).toFixed(5).replace('.', ',')}%</p>
+          <p><strong>VALOR ITENS COMUNICAÇÃO REAJUSTADO:</strong> R$ ${formatarNumero(comunicacaoReajustada)}</p>
+          <p><strong>VALOR ART's, RRT's e TRT's REAJUSTADO:</strong> R$ ${formatarNumero(artsReajustado)}</p>
+        </div>
+      `;
+    }
+
+    document.getElementById('resultado').innerHTML = resultado;
+  }
+
+  // Carregar o primeiro período automático
+  window.onload = function() {
+    adicionarPeriodo();
+  };
+</script>
 </body>
 </html>

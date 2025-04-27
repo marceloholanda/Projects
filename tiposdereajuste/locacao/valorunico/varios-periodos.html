@@ -3,38 +3,194 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reajuste Contratual - Locação</title>
+  <title>Reajuste Contratual</title>
+  <link rel="icon" href="../../../imagens/ChatGPT Image 18 de abr. de 2025, 11_41_37.png">
+  <script src="https://unpkg.com/imask"></script>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100">
-  <!-- Header -->
-  <header class="bg-white shadow-md py-6 flex justify-center">
+  <div class="flex justify-center bg-white py-6">
     <img src="../../../imagens/logo.png" alt="Banco do Nordeste" class="w-72 md:w-80 lg:w-96">
-  </header>
+  </div>
 
-  <!-- Título -->
-  <section class="text-center py-16 px-4 bg-white-50">
-    <h1 class="text-3xl md:text-4xl font-bold text-red-800 mb-4">Reajuste Contratual - Locação</h1>
-    <p class="text-gray-600 max-w-xl mx-auto">Escolha abaixo o tipo de reajuste que deseja aplicar para contratos de Locação.</p>
-  </section>
-  
-  <!-- Botões de Voltar -->
-<div class="flex justify-center gap-4 pb-6">
-  <!-- Voltar para a Página Anterior -->
-  <a href="../../../tiposdereajuste/locacao/p1ep2/selecao-vm-vp.html" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full inline-block transition duration-200 transform hover:scale-105">
-    Voltar à Página Anterior
-  </a>
+  <div class="max-w-2xl mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+    <h2 class="text-2xl font-semibold text-center text-red-800 mb-7">Cálculo de Reajuste Contratual</h2>
 
-  <!-- Voltar para a Página Principal -->
-  <a href="../../../index.html" class="bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-full inline-block transition duration-200 transform hover:scale-105">
-    Voltar à Página Principal
-  </a>
-</div>
+    <label class="font-semibold" for="valorAtual">Valor Atual</label>
+    <input type="text" id="valorAtual" placeholder="Ex: R$ 8.000.000,00" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
 
-  
-  <!-- Rodapé -->
-  <footer class="bg-white text-center text-sm text-gray-500 py-6 border-t" style="position: absolute; bottom: 0; width: 100%;">
+    <label class="font-semibold" for="indice1">Índice de Reajuste 1º Período (%)</label>
+    <input type="text" id="indice1" placeholder="Ex: 4,59001" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="inicioRetro1">Data Início Retroativo 1º Período</label>
+    <input type="text" id="inicioRetro1" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="fimRetro1">Data Fim Retroativo 1º Período</label>
+    <input type="text" id="fimRetro1" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="indice2">Índice de Reajuste 2º Período (%)</label>
+    <input type="text" id="indice2" placeholder="Ex: 1,48000" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="inicioRetro2">Data Início Retroativo 2º Período</label>
+    <input type="text" id="inicioRetro2" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="fimRetro2">Data Fim Retroativo 2º Período</label>
+    <input type="text" id="fimRetro2" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="inicioRem">Data Início Remanescente</label>
+    <input type="text" id="inicioRem" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <label class="font-semibold" for="fimRem">Data Fim Remanescente</label>
+    <input type="text" id="fimRem" placeholder="DD/MM/AAAA" class="w-full px-3 py-2 rounded border border-gray-300 mb-4">
+
+    <button id="calcularBtn" class="w-full bg-red-800 hover:bg-red-700 text-white font-semibold py-2 rounded mt-6">
+      CALCULAR
+    </button>
+
+    <div id="mensagemErro" class="hidden mt-4 p-4 bg-red-100 border-l-8 border-red-700 rounded text-red-800 font-medium"></div>
+    <div id="resultado" class="mt-4 p-4 bg-gray-50 border-l-8 border-red-700 rounded text-gray-700"></div>
+  </div>
+
+  <div class="flex justify-center gap-4 mt-6">
+    <button onclick="window.history.back()" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+      Voltar à Seleção Anterior
+    </button>
+    <a href="../../../index.html" class="w-80 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-1 px-3 rounded-lg transition duration-300 transform hover:scale-105 text-center inline-block">
+      Voltar ao Menu Principal
+    </a>
+  </div>
+
+  <footer class="mt-20 text-center text-sm text-gray-500 pb-8">
     © 2025 Stick e Banco do Nordeste. Todos os direitos reservados.
   </footer>
+
+  <script>
+    function dias360(dataInicio, dataFim) {
+      let [dia1, mes1, ano1] = dataInicio.split("/").map(Number);
+      let [dia2, mes2, ano2] = dataFim.split("/").map(Number);
+
+      if (dia1 === 31) dia1 = 30;
+      if (dia2 === 31 && dia1 === 30) dia2 = 30;
+
+      return ((ano2 - ano1) * 360 + (mes2 - mes1) * 30 + (dia2 - dia1));
+    }
+
+    function arredondar(valor) {
+      return Math.round((valor + Number.EPSILON) * 10000) / 10000;
+    }
+
+    function formatarNumero(valor) {
+      return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function calcular() {
+      const msgErro = document.getElementById('mensagemErro');
+
+      const valorAtualInput = valorAtualMask.unmaskedValue ? parseFloat(valorAtualMask.unmaskedValue) : 0;
+      const indice1 = indice1Mask.unmaskedValue ? parseFloat(indice1Mask.unmaskedValue) / 100 : 0;
+      const indice2 = indice2Mask.unmaskedValue ? parseFloat(indice2Mask.unmaskedValue) / 100 : 0;
+
+      if (isNaN(valorAtualInput) || isNaN(indice1) || isNaN(indice2) || valorAtualInput <= 0) {
+        msgErro.textContent = '⚠️ Preencha corretamente os campos obrigatórios: Valor Atual e Índices de Reajuste.';
+        msgErro.classList.remove('hidden');
+        document.getElementById('resultado').innerHTML = '';
+        return;
+      }
+
+      msgErro.classList.add('hidden');
+
+      const valorAtual = arredondar(valorAtualInput);
+      const valorReajustado1 = arredondar(valorAtual * (1 + indice1));
+      const diferencaMensal1 = arredondar(valorReajustado1 - valorAtual);
+
+      const valorReajustado2 = arredondar(valorReajustado1 * (1 + indice2));
+      const diferencaMensal2 = arredondar(valorReajustado2 - valorAtual);
+
+      let resultado = `
+        <strong>Valor Atual:</strong> R$ ${formatarNumero(valorAtual)}<br>
+        <strong>Índice de Reajuste 1º Período:</strong> ${(indice1 * 100).toFixed(5).replace('.', ',')}%<br>
+        <strong>Índice de Reajuste 2º Período:</strong> ${(indice2 * 100).toFixed(5).replace('.', ',')}%<br><br>
+
+        <strong>Valor Reajustado 1º Período:</strong> R$ ${formatarNumero(valorReajustado1)}<br>
+        <strong>Diferença Mensal 1º Período:</strong> R$ ${formatarNumero(diferencaMensal1)}<br><br>
+
+        <strong>Valor Reajustado 2º Período:</strong> R$ ${formatarNumero(valorReajustado2)}<br>
+        <strong>Diferença Mensal 2º Período:</strong> R$ ${formatarNumero(diferencaMensal2)}<br><br>
+      `;
+
+      let totalRetro1 = 0, totalRetro2 = 0, totalRem = 0;
+
+      const inicioRetro1 = document.getElementById('inicioRetro1').value;
+      const fimRetro1 = document.getElementById('fimRetro1').value;
+      if (inicioRetro1 && fimRetro1) {
+        const mesesRetro1 = arredondar((dias360(inicioRetro1, fimRetro1) + 1) / 30);
+        totalRetro1 = arredondar(diferencaMensal1 * mesesRetro1);
+        resultado += `<strong>Meses Retroativos 1º Período:</strong> ${mesesRetro1.toFixed(2).replace('.', ',')} meses<br>`;
+        resultado += `<strong>Valor Retroativo 1º Período:</strong> R$ ${formatarNumero(totalRetro1)}<br><br>`;
+      }
+
+      const inicioRetro2 = document.getElementById('inicioRetro2').value;
+      const fimRetro2 = document.getElementById('fimRetro2').value;
+      if (inicioRetro2 && fimRetro2) {
+        const mesesRetro2 = arredondar((dias360(inicioRetro2, fimRetro2) + 1) / 30);
+        totalRetro2 = arredondar(diferencaMensal2 * mesesRetro2);
+        resultado += `<strong>Meses Retroativos 2º Período:</strong> ${mesesRetro2.toFixed(2).replace('.', ',')} meses<br>`;
+        resultado += `<strong>Valor Retroativo 2º Período:</strong> R$ ${formatarNumero(totalRetro2)}<br><br>`;
+      }
+
+      const inicioRem = document.getElementById('inicioRem').value;
+      const fimRem = document.getElementById('fimRem').value;
+      if (inicioRem && fimRem) {
+        const mesesRem = arredondar((dias360(inicioRem, fimRem) + 1) / 30);
+        totalRem = arredondar(diferencaMensal2 * mesesRem);
+        resultado += `<strong>Meses Remanescentes:</strong> ${mesesRem.toFixed(2).replace('.', ',')} meses<br>`;
+        resultado += `<strong>Valor Remanescente:</strong> R$ ${formatarNumero(totalRem)}<br><br>`;
+      }
+
+      const valorTotalPLC = arredondar(totalRetro1 + totalRetro2 + totalRem);
+      resultado += `<strong>Valor Total da PLC:</strong> <span class="text-red-800 font-bold">R$ ${formatarNumero(valorTotalPLC)}</span>`;
+
+      document.getElementById('resultado').innerHTML = resultado;
+    }
+
+    // Aplicação das máscaras
+    const valorAtualMask = IMask(document.getElementById('valorAtual'), { 
+      mask: Number, 
+      scale: 2, 
+      signed: false, 
+      thousandsSeparator: '.', 
+      radix: ',', 
+      padFractionalZeros: true 
+    });
+
+    const indice1Mask = IMask(document.getElementById('indice1'), { 
+      mask: Number, 
+      scale: 5, 
+      signed: false, 
+      thousandsSeparator: '', 
+      radix: ',', 
+      padFractionalZeros: true 
+    });
+
+    const indice2Mask = IMask(document.getElementById('indice2'), { 
+      mask: Number, 
+      scale: 5, 
+      signed: false, 
+      thousandsSeparator: '', 
+      radix: ',', 
+      padFractionalZeros: true 
+    });
+
+    const dateMask = { mask: '00/00/0000' };
+    IMask(document.getElementById('inicioRetro1'), dateMask);
+    IMask(document.getElementById('fimRetro1'), dateMask);
+    IMask(document.getElementById('inicioRetro2'), dateMask);
+    IMask(document.getElementById('fimRetro2'), dateMask);
+    IMask(document.getElementById('inicioRem'), dateMask);
+    IMask(document.getElementById('fimRem'), dateMask);
+
+    document.getElementById('calcularBtn').addEventListener('click', calcular);
+  </script>
 </body>
 </html>
